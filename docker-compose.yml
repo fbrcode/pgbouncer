@@ -1,0 +1,63 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    command: |
+      postgres 
+      -c log_statement=all 
+      -c log_destination=stderr 
+      -c hba_file=/etc/pg_hba.conf
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: sample
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      retries: 5
+      start_period: 10s
+      timeout: 5s
+    volumes:
+      - ./conf/postgres/pg_hba.conf:/etc/pg_hba.conf
+      - ./init/:/docker-entrypoint-initdb.d/
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      default:
+        aliases:
+          - postgres
+
+  pgbouncer:
+    image: bitnami/pgbouncer:latest
+    # image: fbrcode-pgbouncer:latest
+    # build:
+    #   context: ./
+    #   dockerfile: docker/Dockerfile
+    container_name: pgbouncer
+    environment:
+      - POSTGRESQL_HOST=postgres
+      - POSTGRESQL_PORT=5432
+      - POSTGRESQL_DATABASE=sample
+      - POSTGRESQL_USER=pgbouncer
+      - POSTGRESQL_PASSWORD=pgbouncer
+      - PGBOUNCER_DATABASE="*"
+      - PGBOUNCER_CONF_FILE=/bitnami/pgbouncer/conf/pgbouncer.ini
+      # - PGBOUNCER_EXTRA_FLAGS=--verbose
+    volumes:
+      - ./conf/pgbouncer/:/bitnami/pgbouncer/conf/
+    ports:
+      - "6432:6432"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      default:
+        aliases:
+          - pgbouncer
+
+volumes:
+  postgres_data:
+networks:
+  default:
+    name: pgb-net

@@ -1,0 +1,1 @@
+CREATE USER pgbouncer SUPERUSER PASSWORD 'pgbouncer';
