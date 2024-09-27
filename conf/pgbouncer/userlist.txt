@@ -1,2 +1,2 @@
-"pgbouncer" "pgbouncer"
+"pgbouncer" "SCRAM-SHA-256$4096:TQ2NPg90uXsGc2t22rdJIw==$z2Y1lmPi9zqD5yP2eg8pd3R5rS0fjEQpOSfxYal6M/o=:2J3V5qcWhh/RMDPsD44FY70IzO+YiNNERpvDeoHuUz4="
 

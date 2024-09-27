@@ -8,18 +8,97 @@ Create a sample code with bitnami/pgbouncer connection pooling with docker compo
 - Docker Compose
 - PostgreSQL client
 
-## How to run it
+## Authentication Options
 
-This will get postgres and pgbouncer images and start the container services.
+Source: <https://www.pgbouncer.org/config.html#authentication-file-format>
 
-```sh
-docker compose up -d
+For pgBouncer, there are 3 authentication options:
+
+### Plain
+
+Fill the results on `conf/pgbouncer/userlist.txt`
+
+```txt
+"pgbouncer" "pgbouncer"
 ```
 
-Restart the container services.
+### MD5
+
+Get user and password md5 hash with the following SQL query.
+
+```sql
+-- connected to any postgres instance, run
+WITH credentials AS (SELECT 'pgbouncer' AS usr, 'pgbouncer' as pwd)
+SELECT pwd || usr AS str, 'md5' || md5(pwd || usr) AS pgbouncer_md5_hash
+FROM credentials;
+
+        str         |         pgbouncer_md5_hash
+--------------------+-------------------------------------
+ pgbouncerpgbouncer | md5be5544d3807b54dd0637f2439ecb03b9
+```
+
+Fill the results on `conf/pgbouncer/userlist.txt`
+
+```txt
+"pgbouncer" "md5be5544d3807b54dd0637f2439ecb03b9"
+```
+
+### SCRAM (Salted Challenge Response Authentication Mechanism)
+
+Get user and password SCRAM hash with the following SQL query.
+
+```sql
+-- check if the password_encryption is set to scram-sha-256
+show password_encryption;
+
+ password_encryption
+---------------------
+ scram-sha-256
+
+-- If it is not set to scram-sha-256, you can change it in your postgresql.conf or for your session:
+SET password_encryption = 'scram-sha-256';
+
+-- get the SCRAM hash
+SELECT rolname, rolpassword FROM pg_authid WHERE rolname = 'pgbouncer';
+
+  rolname  |                                                              rolpassword
+-----------+---------------------------------------------------------------------------------------------------------------------------------------
+ pgbouncer | SCRAM-SHA-256$4096:TQ2NPg90uXsGc2t22rdJIw==$z2Y1lmPi9zqD5yP2eg8pd3R5rS0fjEQpOSfxYal6M/o=:2J3V5qcWhh/RMDPsD44FY70IzO+YiNNERpvDeoHuUz4=
+```
+
+Fill the results on `conf/pgbouncer/userlist.txt`
+
+```txt
+"pgbouncer" "SCRAM-SHA-256$4096:TQ2NPg90uXsGc2t22rdJIw==$z2Y1lmPi9zqD5yP2eg8pd3R5rS0fjEQpOSfxYal6M/o=:2J3V5qcWhh/RMDPsD44FY70IzO+YiNNERpvDeoHuUz4="
+```
+
+> Attention: On this docker compose implementation, first start postgres service, get the SCRAM hash, update `userlist.txt`, and then start pgbouncer service.
+
+## How to run it
+
+This will get postgres image and start the container service.
 
 ```sh
-docker compose down -v && docker compose up -d
+docker compose up -d postgres
+```
+
+This will get pgbouncer image and start the container service.
+
+```sh
+docker compose up -d pgbouncer
+```
+
+Restart the pgbouncer service.
+
+```sh
+docker compose restart pgbouncer
+```
+
+Drop services with their volumes.
+
+```sh
+docker compose down --volumes --remove-orphans pgbouncer
+docker compose down --volumes --remove-orphans postgres
 ```
 
 Output pgbouncer logs.
@@ -53,6 +132,8 @@ psql -d sample
 ```
 
 ## Connect to the admin panel of pgbouncer
+
+Need to add the appropriate grants in `pgBouncer.ini` file (i.e. `admin_users=pgbouncer`)
 
 ```sh
 source .env.pgb.admin

@@ -29,7 +29,7 @@ services:
           - postgres
 
   pgbouncer:
-    image: bitnami/pgbouncer:latest
+    image: bitnami/pgbouncer:1.23.1
     # image: fbrcode-pgbouncer:latest
     # build:
     #   context: ./
@@ -37,9 +37,6 @@ services:
     container_name: pgbouncer
     environment:
       - POSTGRESQL_HOST=postgres
-      - POSTGRESQL_PORT=5432
-      - POSTGRESQL_DATABASE=sample
-      - POSTGRESQL_USER=pgbouncer
       - POSTGRESQL_PASSWORD=pgbouncer
       - PGBOUNCER_DATABASE="*"
       - PGBOUNCER_CONF_FILE=/bitnami/pgbouncer/conf/pgbouncer.ini
