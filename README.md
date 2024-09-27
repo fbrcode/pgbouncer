@@ -53,6 +53,8 @@ Fill the results on `conf/pgbouncer/userlist.txt`
 
 ### SCRAM (Salted Challenge Response Authentication Mechanism)
 
+> Attention: On this docker compose implementation, first start postgres service, get the SCRAM hash for the desired user (in this case `pgbouncer`), update `conf/pgbouncer/userlist.txt`, and then start pgbouncer service.
+
 Get user and password SCRAM hash with the following SQL query.
 
 ```sql
@@ -80,8 +82,6 @@ Fill the results on `conf/pgbouncer/userlist.txt`
 "pgbouncer" "SCRAM-SHA-256$4096:TQ2NPg90uXsGc2t22rdJIw==$z2Y1lmPi9zqD5yP2eg8pd3R5rS0fjEQpOSfxYal6M/o=:2J3V5qcWhh/RMDPsD44FY70IzO+YiNNERpvDeoHuUz4="
 ```
 
-> Attention: On this docker compose implementation, first start postgres service, get the SCRAM hash for the desired user (in this case `pgbouncer`), update `conf/pgbouncer/userlist.txt`, and then start pgbouncer service.
-
 ## How to run it
 
 This will get postgres image and start the container service.
@@ -93,6 +93,9 @@ docker compose up -d postgres
 This will get pgbouncer image and start the container service.
 
 ```sh
+# if using scram-sha-256 authentication method,
+# remember to update userlist.txt file with the user SCRAM hash
+# before starting the pgbouncer service
 docker compose up -d pgbouncer
 ```
 
