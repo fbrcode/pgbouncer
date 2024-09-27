@@ -38,6 +38,7 @@ services:
     #   dockerfile: docker/Dockerfile
     container_name: pgbouncer
     environment:
+      # https://github.com/bitnami/containers/tree/main/bitnami/pgbouncer#configuration
       - POSTGRESQL_HOST=postgres
       - POSTGRESQL_PASSWORD=pgbouncer
       - PGBOUNCER_DATABASE="*"
