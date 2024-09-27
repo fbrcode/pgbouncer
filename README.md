@@ -142,24 +142,29 @@ psql
 psql -d pgbouncer
 
 # issue admin show commands
-show pools; # to see the pool status
-show stats; # to see the statistics
-show clients; # to see the client connections
-show servers; # to see the server connections
-show lists; # to see the list of databases
-show config; # to see the configuration
-show version; # to see the version
-show help; # to see the help
-show dns_hosts; # to see the DNS hosts
-show dns_zones; # to see the DNS zones
-show dns_records; # to see the DNS records
-show dns_query; # to see the DNS query
-show dns_all; # to see the DNS all
-show dns_failover; # to see the DNS failover
-show dns_srv; # to see the DNS SRV
-show dns_srv_all; # to see the DNS SRV all
-show dns_srv_failover; # to see the DNS SRV failover
-show dns_srv_order; # to see the DNS SRV order
-show dns_srv_order_all; # to see the DNS SRV order all
-show dns_srv_order_failover; # to see the DNS SRV order failover
+show help;
+show config;
+show databases;
+show pools;
+show clients;
+show servers;
+show users;
+show version;
+
+show fds;
+show sockets;
+show active_sockets;
+show lists;
+show mem;
+show state;
+
+show dns_hosts;
+show dns_zones;
+
+SHOW STATS|
+
+show stats;
+show stats_totals;
+show stats_averages;
+show totals;
 ```
