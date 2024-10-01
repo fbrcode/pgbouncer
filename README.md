@@ -84,10 +84,12 @@ Fill the results on `conf/pgbouncer/userlist.txt`
 
 ## How to run it
 
+> NOTE: run in this order to avoid any issues. First, start the postgres service, get the SCRAM hash for the desired user (in this case `pgbouncer`), update `conf/pgbouncer/userlist.txt`, and then start pgbouncer service.
+
 This will get postgres image and start the container service.
 
 ```sh
-docker compose up -d postgres
+docker compose --file docker-compose-postgres.yml up -d
 ```
 
 This will get pgbouncer image and start the container service.
@@ -96,20 +98,20 @@ This will get pgbouncer image and start the container service.
 # if using scram-sha-256 authentication method,
 # remember to update userlist.txt file with the user SCRAM hash
 # before starting the pgbouncer service
-docker compose up -d pgbouncer
+docker compose --file docker-compose-pgbouncer.yml up -d
 ```
 
-Restart the pgbouncer service.
+Drop services with their volumes (in this order).
 
 ```sh
-docker compose restart pgbouncer
+docker compose --file docker-compose-pgbouncer.yml down --volumes
+docker compose --file docker-compose-postgres.yml down --volumes --remove-orphans
 ```
 
-Drop services with their volumes.
+Output postgres logs.
 
 ```sh
-docker compose down --volumes --remove-orphans pgbouncer
-docker compose down --volumes --remove-orphans postgres
+docker compose logs -f postgres
 ```
 
 Output pgbouncer logs.
@@ -123,8 +125,6 @@ docker compose logs -f pgbouncer
 ```sh
 source .env
 psql
-# or
-psql -d sample
 
 # check server activity
 \pset pager off

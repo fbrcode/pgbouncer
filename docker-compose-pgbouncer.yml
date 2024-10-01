@@ -1,0 +1,29 @@
+services:
+  pgbouncer:
+    image: bitnami/pgbouncer:1.23.1
+    container_name: pgbouncer
+    environment:
+      # https://github.com/bitnami/containers/tree/main/bitnami/pgbouncer#configuration
+      - POSTGRESQL_HOST=postgres
+      - POSTGRESQL_USER=pgbouncer
+      - POSTGRESQL_PASSWORD=pgbouncer
+      - PGBOUNCER_DATABASE="*"
+      - PGBOUNCER_CONF_FILE="/bitnami/pgbouncer/conf/pgbouncer.ini"
+      # - PGBOUNCER_EXTRA_FLAGS=--verbose
+    healthcheck:
+      # pgbouncer exposes a `pgbouncer` "meta database", providing an interface for statistics and to administer the instance. We use it here to check if pgbouncer is working properly.
+      test: 'env PGPASSWORD="$$POSTGRESQL_PASSWORD" psql -p 6432 -U "$$POSTGRESQL_USER" -d pgbouncer -b -c "SHOW USERS;" > /dev/null'
+      interval: 10s
+      retries: 5
+      start_period: 10s
+      timeout: 5s
+    volumes:
+      - ./conf/pgbouncer/:/bitnami/pgbouncer/conf/
+    ports:
+      - "6432:6432"
+    networks:
+      pgbouncer_net: # Same network as Postgres
+
+networks:
+  pgbouncer_net:
+    external: true
