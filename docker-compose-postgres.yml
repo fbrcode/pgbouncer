@@ -36,4 +36,3 @@ volumes:
 networks:
   default:
     name: pgbouncer_net
-    # driver: bridge
